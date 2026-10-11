@@ -1,43 +1,101 @@
-import { MOCK_SUBJECTS } from "../constants/mock-data";
+import {
+  createDataProvider,
+  type CreateDataProviderOptions,
+} from "@refinedev/rest";
 
-import type {
-  BaseRecord,
-  DataProvider,
-  GetListParams,
-} from "@refinedev/core";
+import { BACKEND_BASE_URL } from "@/constants";
+import type { ListResponse } from "@/types";
 
-export const dataProvider: DataProvider = {
-  getList: async <TData extends BaseRecord = BaseRecord>(
-      { resource }: GetListParams,
-  ) => {
-    if (resource === "subjects") {
-      return {
-        data: MOCK_SUBJECTS as unknown as TData[],
-        total: MOCK_SUBJECTS.length,
+const options: CreateDataProviderOptions = {
+  getList: {
+    getEndpoint: ({ resource }) => resource,
+
+    buildQueryParams: async ({
+                               resource,
+                               pagination,
+                               filters,
+                             }) => {
+      const page = pagination?.currentPage ?? 1;
+      const pageSize = pagination?.pageSize ?? 10;
+
+      const params: Record<string, string | number> = {
+        page,
+        limit: pageSize,
       };
-    }
 
-    return {
-      data: [],
-      total: 0,
-    };
+      filters?.forEach((filter) => {
+        // Ignore conditional filters like "or" / "and"
+        if (!("field" in filter)) {
+          return;
+        }
+
+        const { field, value } = filter;
+
+        // Ignore empty filter values
+        if (
+            value === undefined ||
+            value === null ||
+            value === ""
+        ) {
+          return;
+        }
+
+        if (resource === "subjects") {
+          if (field === "department") {
+            params.department = String(value);
+          }
+
+          if (
+              field === "name" ||
+              field === "code" ||
+              field === "search" ||
+              field === "q"
+          ) {
+            params.search = String(value);
+          }
+        }
+      });
+
+      console.log("Refine filters:", filters);
+      console.log("API query params:", params);
+
+      return params;
+    },
+
+    // Extract the data array from API response
+    mapResponse: async (response) => {
+      const json = await response.json();
+      // Your API returns: { data: [...], total: 123 }
+      // Refine needs: [...]
+      return json.data;
+    },
+
+    // getTotalCount: async (response) => {
+    //   const payload: ListResponse = await response.json();
+    //
+    //   return (
+    //       payload.pagination?.total ??
+    //       payload.data?.length ??
+    //       0
+    //   );
+    // },
+    // 4. Extract the total count for pagination
+    getTotalCount: async (response) => {
+      const json = await response.json();
+      // Your API returns: { data: [...], total: 123 }
+      // Refine needs: 123
+      return (
+          json.pagination?.total ??
+          json.data?.length ??
+          0
+      );
+    },
   },
-
-  getOne: async () => {
-    throw new Error("This function is not present in mock");
-  },
-
-  create: async () => {
-    throw new Error("This function is not present in mock");
-  },
-
-  update: async () => {
-    throw new Error("This function is not present in mock");
-  },
-
-  deleteOne: async () => {
-    throw new Error("This function is not present in mock");
-  },
-
-  getApiUrl: () => "",
 };
+
+const { dataProvider } = createDataProvider(
+    BACKEND_BASE_URL,
+    options,
+);
+
+export { dataProvider };
