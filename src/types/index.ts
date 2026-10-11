@@ -3,7 +3,7 @@ export type Subject = {
     name: string;
     code: string;
     description: string;
-    department: string;
+    department: Pick<Department, "id" | "name"> | string;
     createdAt?: string;
 };
 
