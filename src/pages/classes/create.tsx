@@ -198,9 +198,7 @@ const Create = () => {
                               }
                             : null
                         }
-                        onChange={(file: any, field: any) => {
-                          setBannerImage(file, field);
-                        }}
+                        onChange={(file: any) => setBannerImage(file, field)}
                       />
 
                       {(fieldState.error || errors.bannerCldPubId) && (
