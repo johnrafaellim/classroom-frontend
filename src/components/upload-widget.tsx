@@ -1,0 +1,144 @@
+import { useEffect, useRef, useState } from "react";
+import { UploadWidgetValue } from "@/types";
+import { UploadCloud } from "lucide-react";
+import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET } from "@/constants";
+
+import { Button } from "@/components/ui/button"
+import { ButtonGroup } from "@/components/ui/button-group"
+
+const UploadWidget = ({ value = null, onChange, disabled = false }) => {
+  const widgetRef = useRef<CloudinaryWidget | null>(null);
+  const onChangeRef = useRef(onChange);
+
+  const [preview, setPreview] = useState<UploadWidgetValue | null>(value);
+  // const [deleteToken, setDeleteToken] = useState<string | null>(null);
+  // const [isRemoving, setIsRemoving] = useState(false);
+
+  useEffect(() => {
+    setPreview(value);
+
+    // if (!value) {
+    //   setDeleteToken(null);
+    // }
+  }, [value]);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const initializeWidget = () => {
+      // Cloudinary script hasn't loaded yet
+      // or the widget was already initialized.
+      if (!window.cloudinary || widgetRef.current) {
+        return false;
+      }
+
+      widgetRef.current = window.cloudinary.createUploadWidget(
+        {
+          cloudName: CLOUDINARY_CLOUD_NAME,
+          uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+          multiple: false,
+          folder: "uploads",
+          maxFileSize: 5000000,
+          clientAllowedFormats: ["png", "jpg", "jpeg", "webp"],
+        },
+        (error, result) => {
+          if (!error && result.event === "success") {
+            const payload: UploadWidgetValue = {
+              url: result.info.secure_url,
+              publicId: result.info.public_id,
+            };
+
+            setPreview(payload);
+            // setDeleteToken(result.info.delete_token ?? null);
+
+            onChangeRef.current?.(payload);
+          }
+        }
+      );
+
+      return true;
+    };
+
+    // Widget initialized immediately.
+    // Do not return false here because useEffect can only
+    // return undefined or a cleanup function.
+    if (initializeWidget()) {
+      return;
+    }
+
+    // Cloudinary may not have loaded yet, so keep checking.
+    const intervalId = window.setInterval(() => {
+      if (initializeWidget()) {
+        window.clearInterval(intervalId);
+      }
+    }, 500);
+
+    // Cleanup when the component unmounts.
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
+  const openWidget = () => {
+    if (!disabled) {
+      widgetRef.current?.open();
+    }
+  };
+
+  const removeFromCloudinary = async () => {};
+
+  const clearImage = () => {
+    setPreview(null);
+    onChangeRef.current?.(null);
+  };
+
+  return (
+    <div className="space-y-2">
+      {preview ? (
+        <div className="relative">
+          <div className="upload-preview">
+            <img src={preview.url} alt="Uploaded file" />
+          </div>
+          <div className="absolute top-0 right-0 w-fit m-2">
+            <ButtonGroup>
+              <Button variant="outline" size="sm" onClick={openWidget}>
+                Change
+              </Button>
+              <Button variant="outline" size="sm" onClick={clearImage}>
+                Remove
+              </Button>
+            </ButtonGroup>
+          </div>
+        </div>
+      ) : (
+        <div
+          className="upload-dropzone"
+          role="button"
+          tabIndex={0}
+          onClick={openWidget}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              openWidget();
+            }
+          }}
+        >
+          <div className="upload-prompt">
+            <UploadCloud className="icon" />
+
+            <div>
+              <p>Click to upload photo</p>
+              <p>PNG, JPG up to 5MB</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default UploadWidget;
