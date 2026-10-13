@@ -157,7 +157,7 @@ const Create = () => {
 
       <div className="intro-row">
         <p>Provide the required information below to add a class.</p>
-        <Button onClick={() => back}>Go Back</Button>
+        <Button onClick={() => back()}>Go Back</Button>
       </div>
 
       <Separator />
@@ -183,7 +183,7 @@ const Create = () => {
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor={field.name}>
-                        Banner Image
+                        Banner Images
                         <span className="text-orange-600" aria-hidden="true">
                           *
                         </span>
@@ -203,10 +203,10 @@ const Create = () => {
                         }}
                       />
 
-                      {errors.bannerCldPubId && !errors.bannerUrl && (
-                        <p className="text-descructive">
-                          {errors.bannerCldPubId.message?.toString()}
-                        </p>
+                      {(fieldState.error || errors.bannerCldPubId) && (
+                        <FieldError
+                          errors={[fieldState.error ?? errors.bannerCldPubId]}
+                        />
                       )}
                     </Field>
                   )}

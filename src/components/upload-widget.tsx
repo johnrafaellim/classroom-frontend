@@ -3,6 +3,9 @@ import { UploadWidgetValue } from "@/types";
 import { UploadCloud } from "lucide-react";
 import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET } from "@/constants";
 
+import { Button } from "@/components/ui/button"
+import { ButtonGroup } from "@/components/ui/button-group"
+
 const UploadWidget = ({ value = null, onChange, disabled = false }) => {
   const widgetRef = useRef<CloudinaryWidget | null>(null);
   const onChangeRef = useRef(onChange);
@@ -88,11 +91,28 @@ const UploadWidget = ({ value = null, onChange, disabled = false }) => {
 
   const removeFromCloudinary = async () => {};
 
+  const clearImage = () => {
+    setPreview(null);
+    onChangeRef.current?.(null);
+  };
+
   return (
     <div className="space-y-2">
       {preview ? (
-        <div className="upload-preview">
-          <img src={preview.url} alt="Uploaded file" />
+        <div className="relative">
+          <div className="upload-preview">
+            <img src={preview.url} alt="Uploaded file" />
+          </div>
+          <div className="absolute top-0 right-0 w-fit m-2">
+            <ButtonGroup>
+              <Button variant="outline" size="sm" onClick={openWidget}>
+                Change
+              </Button>
+              <Button variant="outline" size="sm" onClick={clearImage}>
+                Remove
+              </Button>
+            </ButtonGroup>
+          </div>
         </div>
       ) : (
         <div
@@ -101,7 +121,7 @@ const UploadWidget = ({ value = null, onChange, disabled = false }) => {
           tabIndex={0}
           onClick={openWidget}
           onKeyDown={(event) => {
-            if (event.key === "Enter") {
+            if (event.key === "Enter" || event.key === " ") {
               event.preventDefault();
               openWidget();
             }
