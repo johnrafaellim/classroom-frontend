@@ -43,7 +43,7 @@ export const classSchema = z.object({
     })
     .min(1, "Subject is required"),
   teacherId: z.coerce
-    .number({
+    .string({
       required_error: "Teacher is required",
       invalid_type_error: "Teacher is required",
     })

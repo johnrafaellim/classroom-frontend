@@ -1,7 +1,7 @@
 import { CreateView } from "@/components/refine-ui/views/create-view.tsx";
 import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { useBack } from "@refinedev/core";
+import { useBack, useList } from "@refinedev/core";
 import { Separator } from "@/components/ui/separator.tsx";
 import {
   Card,
@@ -47,6 +47,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label.tsx";
 import { Textarea } from "@/components/ui/textarea";
 import UploadWidget from "@/components/upload-widget.tsx";
+import { Subject, User } from "@/types";
 
 const Create = () => {
   const back = useBack();
@@ -69,11 +70,12 @@ const Create = () => {
   const {
     handleSubmit,
     formState: { isSubmitting, errors },
+    refineCore: { onFinish },
   } = form;
 
-  const onSubmit = (values: z.infer<typeof classSchema>) => {
+  const onSubmit = async (values: z.infer<typeof classSchema>) => {
     try {
-      console.log(values);
+      await onFinish(values);
     } catch (e) {
       console.error("Error creating new classes", e);
     }
@@ -83,43 +85,26 @@ const Create = () => {
     console.log("Validation errors:", errors);
   };
 
-  const teachers = [
-    {
-      id: "1",
-      name: "John Doe",
+  const { query: subjectsQuery } = useList<Subject>({
+    resource: "subjects",
+    pagination: {
+      pageSize: 100,
     },
-    {
-      id: "2",
-      name: "Jane Smith",
-    },
-    {
-      id: "3",
-      name: "Dr. Alan Turing",
-    },
-  ];
+  });
 
-  const subjects = [
-    {
-      id: 1,
-      name: "Mathematics",
-      code: "MATH",
+  const { query: teachersQuery } = useList<User>({
+    resource: "users",
+    filters: [{ field: "role", operator: "eq", value: "teacher" }],
+    pagination: {
+      pageSize: 100,
     },
-    {
-      id: 2,
-      name: "Computer Science",
-      code: "CS",
-    },
-    {
-      id: 3,
-      name: "Physics",
-      code: "PHY",
-    },
-    {
-      id: 4,
-      name: "Chemistry",
-      code: "CHEM",
-    },
-  ];
+  });
+
+  const subjects = subjectsQuery?.data?.data || [];
+  const subjectsLoading = subjectsQuery.isLoading;
+
+  const teachers = teachersQuery?.data?.data || [];
+  const teachersLoading = teachersQuery.isLoading;
 
   const bannerPublicId = form.watch("bannerCldPubId");
 
@@ -258,6 +243,7 @@ const Create = () => {
                           onValueChange={(value) => {
                             field.onChange(Number(value));
                           }}
+                          disabled={subjectsLoading}
                         >
                           <SelectTrigger
                             id={field.name}
@@ -301,9 +287,8 @@ const Create = () => {
 
                         <Select
                           value={field.value?.toString() ?? ""}
-                          onValueChange={(value) => {
-                            field.onChange(Number(value));
-                          }}
+                          onValueChange={field.onChange}
+                          disabled={teachersLoading}
                         >
                           <SelectTrigger
                             id={field.name}
