@@ -32,27 +32,23 @@
             function () {
               (w[r].q = w[r].q || []).push(arguments);
             };
-
           h = d.createElement("script");
           h.async = true;
           h.setAttribute("src", s + k);
-
           d.getElementsByTagName("head")[0].appendChild(h);
-
-          m = window.onerror;
-
-          window.onerror = function (b, c, d, f, g) {
-            m && m(b, c, d, f, g);
-            g || (g = new Error(b));
-            (w[r].q = w[r].q || []).push(["captureException", g]);
-          };
+          (m = window.onerror),
+            (window.onerror = function (b, c, d, f, g) {
+              m && m(b, c, d, f, g),
+                g || (g = new Error(b)),
+                (w[r].q = w[r].q || []).push(["captureException", g]);
+            });
         }
       })(
         window,
         document,
         "//static.site24x7rum.com/beacon/site24x7rum-min.js?appKey=",
         "s247r",
-        "09b720ded73402a6462fe978b1e17572"
+        "dab6f9e628c4c678cb77ee041a63998b"
       );
     </script>
     <title>Classroom</title>
