@@ -13,7 +13,7 @@ import {
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "@refinedev/react-hook-form";
-import { Controller } from "react-hook-form";
+import {Controller, ControllerRenderProps} from "react-hook-form";
 import { classSchema } from "@/lib/schema.ts";
 
 import {
@@ -47,7 +47,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label.tsx";
 import { Textarea } from "@/components/ui/textarea";
 import UploadWidget from "@/components/upload-widget.tsx";
-import { Subject, User } from "@/types";
+import {Subject, UploadWidgetValue, User} from "@/types";
 
 const Create = () => {
   const back = useBack();
@@ -108,7 +108,7 @@ const Create = () => {
 
   const bannerPublicId = form.watch("bannerCldPubId");
 
-  const setBannerImage = (file: any, field: any) => {
+  const setBannerImage = (file: UploadWidgetValue | null, field: ControllerRenderProps<z.infer<typeof classSchema>, "bannerUrl">) => {
     if (file) {
       // Update the banner image URL in the form field.
       field.onChange(file.url);
@@ -183,7 +183,7 @@ const Create = () => {
                               }
                             : null
                         }
-                        onChange={(file: any) => setBannerImage(file, field)}
+                        onChange={(file) => setBannerImage(file, field)}
                       />
 
                       {(fieldState.error || errors.bannerCldPubId) && (

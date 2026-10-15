@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { UploadWidgetValue } from "@/types";
+import {UploadWidgetProps, UploadWidgetValue} from "@/types";
 import { UploadCloud } from "lucide-react";
 import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET } from "@/constants";
 
 import { Button } from "@/components/ui/button"
 import { ButtonGroup } from "@/components/ui/button-group"
 
-const UploadWidget = ({ value = null, onChange, disabled = false }) => {
+const UploadWidget = ({ value = null, onChange, disabled = false }: UploadWidgetProps) => {
   const widgetRef = useRef<CloudinaryWidget | null>(null);
   const onChangeRef = useRef(onChange);
 
@@ -105,10 +105,10 @@ const UploadWidget = ({ value = null, onChange, disabled = false }) => {
           </div>
           <div className="absolute top-0 right-0 w-fit m-2">
             <ButtonGroup>
-              <Button variant="outline" size="sm" onClick={openWidget}>
+              <Button variant="outline" size="sm" type="button" onClick={openWidget}>
                 Change
               </Button>
-              <Button variant="outline" size="sm" onClick={clearImage}>
+              <Button variant="outline" size="sm" type="button" onClick={clearImage}>
                 Remove
               </Button>
             </ButtonGroup>

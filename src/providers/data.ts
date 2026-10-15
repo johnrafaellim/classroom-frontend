@@ -78,25 +78,16 @@ const options: CreateDataProviderOptions = {
     mapResponse: async (response) => {
       if(!response.ok) throw await buildHttpError(response);
 
-      const json = await response.json();
+      const json = (await response.json()) as ListResponse;
       // Your API returns: { data: [...], total: 123 }
       // Refine needs: [...]
-      return json.data;
+      return json.data ?? [];
     },
 
-    // getTotalCount: async (response) => {
-    //   const payload: ListResponse = await response.json();
-    //
-    //   return (
-    //       payload.pagination?.total ??
-    //       payload.data?.length ??
-    //       0
-    //   );
-    // },
     // 4. Extract the total count for pagination
     getTotalCount: async (response) => {
       if(!response.ok) throw await buildHttpError(response);
-      const json = await response.json();
+      const json = (await response.json()) as ListResponse;
       // Your API returns: { data: [...], total: 123 }
       // Refine needs: 123
       return json.pagination?.total ?? json.data?.length ?? 0;
