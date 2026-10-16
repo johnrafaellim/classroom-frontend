@@ -27,7 +27,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, ListIcon } from "lucide-react";
+import {ChevronRight, GraduationCap, ListIcon} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Sidebar() {
@@ -243,7 +243,7 @@ function SidebarHeader() {
           }
         )}
       >
-        <div>{title.icon}</div>
+        <div><GraduationCap /></div>
         <h2
           className={cn(
             "text-sm",
@@ -256,7 +256,7 @@ function SidebarHeader() {
             }
           )}
         >
-          {title.text}
+          Classroom
         </h2>
       </div>
 
