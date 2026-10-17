@@ -28,7 +28,7 @@ const Show = () => {
             {isLoading
               ? "Loading class details ..."
               : isError
-              ? "Failed to load class details... "
+              ? "Failed to load class details."
               : "Class details not found"}
           </p>
         </ShowViewHeader>
