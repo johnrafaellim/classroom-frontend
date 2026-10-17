@@ -1,6 +1,4 @@
-import {
-  Refine,
-} from "@refinedev/core";
+import { Refine } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 
@@ -14,13 +12,17 @@ import { useNotificationProvider } from "./components/refine-ui/notification/use
 import { Toaster } from "./components/refine-ui/notification/toaster";
 import { ThemeProvider } from "./components/refine-ui/theme/theme-provider";
 import "./App.css";
+import { BookOpen, GraduationCap, Home } from "lucide-react";
+import { dataProvider } from "@/providers/data.ts";
+
 import Dashboard from "@/pages/dashboard.tsx";
-import {BookOpen, GraduationCap, Home} from "lucide-react";
+// Subjects
 import SubjectsList from "@/pages/subjects/list.tsx";
 import SubjectsCreate from "@/pages/subjects/create.tsx";
+// Classes
 import ClassesList from "@/pages/classes/list.tsx";
 import ClassesCreate from "@/pages/classes/create.tsx";
-import {dataProvider} from "@/providers/data.ts";
+import ClassesShow from "@/pages/classes/show.tsx";
 
 function App() {
   return (
@@ -39,40 +41,44 @@ function App() {
               }}
               resources={[
                 {
-                  name: 'dashboard',
-                  list: '/',
-                  meta: { 'label': 'Home', icon: <Home /> },
+                  name: "dashboard",
+                  list: "/",
+                  meta: { label: "Home", icon: <Home /> },
                 },
                 {
-                  name: 'subjects',
-                  list: '/subjects',
-                  create: '/subjects/create',
-                  meta: { 'label': 'Subjects', icon: <BookOpen /> },
+                  name: "subjects",
+                  list: "/subjects",
+                  create: "/subjects/create",
+                  meta: { label: "Subjects", icon: <BookOpen /> },
                 },
                 {
-                  name: 'classes',
-                  list: '/classes',
-                  create: '/classes/create',
-                  meta: { 'label': 'Classes', icon: <GraduationCap /> },
-                }
+                  name: "classes",
+                  show: "/classes/show/:id",
+                  list: "/classes",
+                  create: "/classes/create",
+                  meta: { label: "Classes", icon: <GraduationCap /> },
+                },
               ]}
             >
               <Routes>
-                <Route element={
-                  <Layout>
-                     <Outlet />
-                  </Layout>
-                }>
-                  <Route path="/" element={<Dashboard />}/>
+                <Route
+                  element={
+                    <Layout>
+                      <Outlet />
+                    </Layout>
+                  }
+                >
+                  <Route path="/" element={<Dashboard />} />
                   <Route path="subjects">
-                    <Route index element={<SubjectsList/>}/>
-                    <Route path="create" element={<SubjectsCreate/>}/>
+                    <Route index element={<SubjectsList />} />
+                    <Route path="create" element={<SubjectsCreate />} />
                   </Route>
                   <Route path="classes">
-                    <Route index element={<ClassesList/>}/>
-                    <Route path="create" element={<ClassesCreate/>}/>
+                    <Route index element={<ClassesList />} />
+                    <Route path="create" element={<ClassesCreate />} />
+                    <Route path="show/:id" element={<ClassesShow />} />
                   </Route>
-              </Route>
+                </Route>
               </Routes>
               <Toaster />
               <RefineKbar />
